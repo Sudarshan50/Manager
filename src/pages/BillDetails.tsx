@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { FileText, X } from "lucide-react";
@@ -7,8 +7,8 @@ import { DatePicker } from "@/components/DatePicker";
 export default function BillDetails() {
   // State for bill details
   const [showStatement, setShowStatement] = useState(false);
-  const [startDate, setStartDate] = useState<Date>();
-  const [endDate, setEndDate] = useState<Date>();
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   
   // Mock data for bill logs
   const billLogs = [
