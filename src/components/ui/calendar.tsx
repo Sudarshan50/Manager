@@ -50,6 +50,12 @@ function Calendar({
         day_range_middle:
           "aria-selected:bg-accent aria-selected:text-accent-foreground",
         day_hidden: "invisible",
+        // Add styles for year and month dropdown buttons
+        caption_dropdowns: "flex justify-center gap-1",
+        dropdown: "relative bg-gaming-darker border border-gaming-accent/30 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-gaming-accent",
+        dropdown_month: "mr-1",
+        dropdown_year: "ml-1",
+        dropdown_icon: "ml-2 h-4 w-4",
         ...classNames,
       }}
       components={{

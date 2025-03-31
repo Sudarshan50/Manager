@@ -14,10 +14,21 @@ interface DatePickerProps {
 }
 
 export function DatePicker({ date, setDate, label }: DatePickerProps) {
+  // Add state to control the open/close state of the popover
+  const [open, setOpen] = React.useState(false);
+
+  // Handle date selection and close the popover
+  const handleSelect = (selectedDate: Date | undefined) => {
+    setDate(selectedDate);
+    if (selectedDate) {
+      setOpen(false); // Close the popover after selection
+    }
+  };
+
   return (
     <div className="w-full">
       <label className="block text-sm font-medium mb-1">{label}</label>
-      <Popover>
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant={"outline"}
@@ -34,8 +45,11 @@ export function DatePicker({ date, setDate, label }: DatePickerProps) {
           <Calendar
             mode="single"
             selected={date}
-            onSelect={setDate}
+            onSelect={handleSelect}
             initialFocus
+            captionLayout="dropdown-buttons" // Enable year/month dropdown
+            fromYear={2000}
+            toYear={2030}
           />
         </PopoverContent>
       </Popover>
