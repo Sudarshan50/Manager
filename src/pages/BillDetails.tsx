@@ -1,16 +1,14 @@
-
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { FileText, X, Calendar } from "lucide-react";
+import { FileText, X } from "lucide-react";
+import { DatePicker } from "@/components/DatePicker";
 
 export default function BillDetails() {
   // State for bill details
   const [showStatement, setShowStatement] = useState(false);
-  const [dateRange, setDateRange] = useState({
-    startDate: "",
-    endDate: "",
-  });
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
   
   // Mock data for bill logs
   const billLogs = [
@@ -71,19 +69,15 @@ export default function BillDetails() {
   const weeklyHours = 87;
   const monthlyHours = 320;
   
-  // Handle date range change
-  const handleDateRangeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setDateRange({
-      ...dateRange,
-      [name]: value,
-    });
-  };
-  
   // Handle generate statement
   const handleGenerateStatement = () => {
-    if (!dateRange.startDate || !dateRange.endDate) {
+    if (!startDate || !endDate) {
       toast.error("Please select both start and end dates");
+      return;
+    }
+    
+    if (endDate < startDate) {
+      toast.error("End date cannot be before start date");
       return;
     }
     
@@ -191,41 +185,17 @@ export default function BillDetails() {
             </div>
             
             <form onSubmit={(e) => { e.preventDefault(); handleGenerateStatement(); }} className="space-y-6">
-              <div>
-                <label htmlFor="startDate" className="block text-sm font-medium mb-1">
-                  Start Date
-                </label>
-                <div className="relative">
-                  <Calendar size={18} className="absolute top-2.5 left-3 text-muted-foreground" />
-                  <input
-                    id="startDate"
-                    name="startDate"
-                    type="date"
-                    value={dateRange.startDate}
-                    onChange={handleDateRangeChange}
-                    className="gaming-input w-full pl-10"
-                    required
-                  />
-                </div>
-              </div>
+              <DatePicker 
+                date={startDate} 
+                setDate={setStartDate} 
+                label="Start Date" 
+              />
               
-              <div>
-                <label htmlFor="endDate" className="block text-sm font-medium mb-1">
-                  End Date
-                </label>
-                <div className="relative">
-                  <Calendar size={18} className="absolute top-2.5 left-3 text-muted-foreground" />
-                  <input
-                    id="endDate"
-                    name="endDate"
-                    type="date"
-                    value={dateRange.endDate}
-                    onChange={handleDateRangeChange}
-                    className="gaming-input w-full pl-10"
-                    required
-                  />
-                </div>
-              </div>
+              <DatePicker 
+                date={endDate} 
+                setDate={setEndDate} 
+                label="End Date" 
+              />
               
               <div className="flex justify-end gap-4 pt-4">
                 <button
