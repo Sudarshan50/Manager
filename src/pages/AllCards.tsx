@@ -60,9 +60,9 @@ export default function AllCards() {
     const hashToSearch = user.status === "New" ? user.generatedHash : user.userHash;
     
     return (
-      user.name.toLowerCase().includes(query) ||
-      user.mobileNo.toLowerCase().includes(query) ||
-      hashToSearch.toLowerCase().includes(query)
+      (user.name && user.name.toLowerCase().includes(query)) ||
+      (user.mobileNo && user.mobileNo.toLowerCase().includes(query)) ||
+      (hashToSearch && hashToSearch.toLowerCase().includes(query))
     );
   });
   
