@@ -3,36 +3,49 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Play, Trash2 } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export default function ActiveUsers() {
   // Mock data for active users
   const [users, setUsers] = useState([
     {
       id: 1,
+      userHash: "TUF8X4N2",
       name: "Alex Johnson",
       status: "Active",
       loginTime: "2023-05-15T09:30:00",
     },
     {
       id: 2,
+      userHash: "TUFY7M1P",
       name: "Sarah Williams",
       status: "Paused",
       loginTime: "2023-05-15T10:15:00",
     },
     {
       id: 3,
+      userHash: "TUFD9R3L",
       name: "Michael Brown",
       status: "Active",
       loginTime: "2023-05-15T11:00:00",
     },
     {
       id: 4,
+      userHash: "TUFK2S8B",
       name: "Emily Davis",
       status: "Paused",
       loginTime: "2023-05-15T08:45:00",
     },
     {
       id: 5,
+      userHash: "TUFP5T7Q",
       name: "Daniel Wilson",
       status: "Active",
       loginTime: "2023-05-15T12:30:00",
@@ -46,6 +59,11 @@ export default function ActiveUsers() {
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+  
+  // Mask user hash to only show first 3 and last 2 characters
+  const maskUserHash = (hash: string) => {
+    return hash.substring(0, 3) + "****" + hash.substring(hash.length - 2);
   };
   
   // Handle resume user
@@ -86,20 +104,24 @@ export default function ActiveUsers() {
       
       {users.length > 0 ? (
         <div className="gaming-card overflow-hidden overflow-x-auto">
-          <table className="gaming-table w-full">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Status</th>
-                <th>Login Time</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.id}>
-                  <td>{user.name}</td>
-                  <td>
+          <Table className="gaming-table w-full">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-12">S.No</TableHead>
+                <TableHead>User Hash</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Login Time</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.map((user, index) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">{index + 1}</TableCell>
+                  <TableCell className="font-mono">{maskUserHash(user.userHash)}</TableCell>
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>
                     <span
                       className={`inline-block px-2 py-1 rounded text-xs font-medium ${
                         user.status === "Active"
@@ -109,9 +131,9 @@ export default function ActiveUsers() {
                     >
                       {user.status}
                     </span>
-                  </td>
-                  <td>{formatLoginTime(user.loginTime)}</td>
-                  <td>
+                  </TableCell>
+                  <TableCell>{formatLoginTime(user.loginTime)}</TableCell>
+                  <TableCell>
                     <div className="flex space-x-2">
                       {user.status === "Paused" && (
                         <button
@@ -130,11 +152,11 @@ export default function ActiveUsers() {
                         Revoke
                       </button>
                     </div>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       ) : (
         <div className="text-center py-12 gaming-card">
