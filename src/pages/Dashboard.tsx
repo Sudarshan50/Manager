@@ -1,19 +1,39 @@
-
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import axios from "axios";
+import { toast } from "sonner";
 
 export default function Dashboard() {
   const [isLoaded, setIsLoaded] = useState(false);
-  
+  const [data, setData] = useState({
+    totalUsers: 0,
+    totalBill: 0,
+    totalRevenue: 0,
+  });
+
+  const getDashContent = async () => {
+    await axios
+      .get("http://localhost:3000/api/admin/dashboard")
+      .then((res) => {
+        if (res.status === 200) {
+          setData(res.data?.data);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error("Failed to fetch dashboard data");
+      });
+  };
+
   useEffect(() => {
-    // Simulate loading
+    getDashContent();
     const timer = setTimeout(() => {
       setIsLoaded(true);
     }, 500);
-    
+
     return () => clearTimeout(timer);
   }, []);
-  
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh]">
       <motion.div
@@ -25,29 +45,30 @@ export default function Dashboard() {
         <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-neon-blue via-gaming-accent to-neon-purple bg-clip-text text-transparent animate-gradient-flow">
           TUF Esports Lounge
         </h1>
-        
+
         <p className="text-xl text-muted-foreground max-w-2xl mb-12">
-          Managing your gaming center has never been this sleek. Navigate through the sidebar to access all features.
+          Managing your gaming center has never been this sleek. Navigate
+          through the sidebar to access all features.
         </p>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <StatCard 
-            title="Active Users" 
-            value="12" 
-            description="Currently gaming" 
-            delay={0.4} 
+          <StatCard
+            title="Unique Users"
+            value={data?.totalUsers || "0"}
+            description="Today's gaming"
+            delay={0.4}
           />
-          <StatCard 
-            title="Today's Hours" 
-            value="87.5" 
-            description="Hours of gameplay" 
-            delay={0.5} 
+          <StatCard
+            title="Today's Hours"
+            value={data?.totalBill || "0"}
+            description="Hours of gameplay"
+            delay={0.5}
           />
-          <StatCard 
-            title="Total Revenue" 
-            value="$1,245" 
-            description="This month" 
-            delay={0.6} 
+          <StatCard
+            title="Total Revenue"
+            value="$"
+            description="This month"
+            delay={0.6}
           />
         </div>
       </motion.div>

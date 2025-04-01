@@ -2,24 +2,18 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 
 export default function AddUser() {
+  const getParam = useParams();
+  const navigate = useNavigate();
+  const userHash = getParam?.userHash;
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
   });
-  
-  const userHash = generateUserHash();
-  
-  function generateUserHash() {
-    // Generate a random user hash
-    const hashChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let hash = "";
-    for (let i = 0; i < 8; i++) {
-      hash += hashChars.charAt(Math.floor(Math.random() * hashChars.length));
-    }
-    return hash;
-  }
+  const [loading,setLoading] = useState(false);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -29,8 +23,9 @@ export default function AddUser() {
     });
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     
     // Validate form
     if (!formData.name || !formData.phone) {
@@ -42,9 +37,22 @@ export default function AddUser() {
       toast.error("Please enter a valid 10-digit phone number");
       return;
     }
-    
-    // Mock submission (would connect to backend in real implementation)
-    toast.success(`User ${formData.name} added successfully`);
+    await axios.post(`http://localhost:3000/api/admin/add`, {
+      userHash: userHash,
+      name: formData.name,
+      phoneNumber: formData.phone,
+    }).then((res) => {
+      if(res.status === 200)
+      {
+        console.log(res.data);
+      toast.success(`User ${formData.name} added successfully`);
+      }
+    }).catch((err) => {
+      console.log(err);
+      toast.error("Error adding user. Please try again.");
+    });
+    setLoading(false);
+    navigate("/all-cards");
     
     // Reset form
     setFormData({

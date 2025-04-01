@@ -29,7 +29,7 @@ const App = () => (
               <Dashboard />
             </Layout>
           } />
-          <Route path="/add-user" element={
+          <Route path="/add-user/:userHash" element={
             <Layout>
               <AddUser />
             </Layout>
@@ -44,7 +44,7 @@ const App = () => (
               <AllCards />
             </Layout>
           } />
-          <Route path="/recharge" element={
+          <Route path="/recharge/:userId" element={
             <Layout>
               <RechargePlans />
             </Layout>

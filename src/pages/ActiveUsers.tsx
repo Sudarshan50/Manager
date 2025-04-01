@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Play, Trash2 } from "lucide-react";
@@ -11,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import axios from "axios";
 
 export default function ActiveUsers() {
   // Mock data for active users
@@ -51,21 +51,65 @@ export default function ActiveUsers() {
       loginTime: "2023-05-15T12:30:00",
     },
   ]);
-  
+
+  const fetchActiveSession = async () => {
+    await axios
+      .get("http://localhost:3000/api/admin/active")
+      .then((res) => {
+        if (res.status === 200) {
+          console.log(res.data);
+          interface User {
+            id: number;
+            userHash: string;
+            name: string;
+            status: string;
+            loginTime: string;
+          }
+          const userData = res.data?.data.map((user: User) => ({
+            id: user.id,
+            userHash: user.userHash,
+            name: user.name,
+            status: user.status === "active" ? "Active" : "Paused",
+            loginTime: user.loginTime,
+          }));
+          setUsers(userData);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Error fetching active sessions. Please try again.");
+      });
+  };
+
   // Format login time
   const formatLoginTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const loginTime = new Date(dateString);
+    const currentTime = new Date();
+
+    if (isNaN(loginTime.getTime())) {
+      return "Invalid Date";
+    }
+
+    const diffInMs = currentTime.getTime() - loginTime.getTime();
+    const diffInSeconds = Math.floor(diffInMs / 1000);
+    const seconds = diffInSeconds % 60;
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    const minutes = diffInMinutes % 60;
+    const hours = Math.floor(diffInMinutes / 60);
+
+    if (hours < 24) {
+      return `${hours} hour(s), ${minutes} minute(s), and ${seconds} second(s) ago`;
+    }
+
+    const diffInDays = Math.floor(hours / 24);
+    return `${diffInDays} day(s) ago`;
   };
-  
+
   // Mask user hash to only show first 3 and last 2 characters
   const maskUserHash = (hash: string) => {
     return hash.substring(0, 3) + "****" + hash.substring(hash.length - 2);
   };
-  
+
   // Handle resume user
   const handleResume = (userId: number) => {
     setUsers(
@@ -73,24 +117,34 @@ export default function ActiveUsers() {
         user.id === userId ? { ...user, status: "Active" } : user
       )
     );
-    
+
     const user = users.find((u) => u.id === userId);
     if (user) {
       toast.success(`Resumed session for ${user.name}`);
     }
   };
-  
+
   // Handle revoke user
-  const handleRevoke = (userId: number) => {
-    const user = users.find((u) => u.id === userId);
-    
-    setUsers(users.filter((user) => user.id !== userId));
-    
-    if (user) {
-      toast.success(`Revoked session for ${user.name}`);
-    }
+  const handleRevoke = async (userId: string) => {
+    await axios
+      .post("http://localhost:3000/api/admin/revoke", {
+        userHash: userId,
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          setUsers(users.filter((user) => user.userHash !== userId));
+          toast.success(`Revoked session for ${userId}`);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Error revoking session. Please try again.");
+      });
   };
-  
+  useEffect(() => {
+    fetchActiveSession();
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -99,9 +153,11 @@ export default function ActiveUsers() {
     >
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Active Users</h1>
-        <p className="text-muted-foreground">Manage currently active and paused user sessions</p>
+        <p className="text-muted-foreground">
+          Manage currently active and paused user sessions
+        </p>
       </div>
-      
+
       {users.length > 0 ? (
         <div className="gaming-card overflow-hidden overflow-x-auto">
           <Table className="gaming-table w-full">
@@ -119,7 +175,9 @@ export default function ActiveUsers() {
               {users.map((user, index) => (
                 <TableRow key={user.id}>
                   <TableCell className="font-medium">{index + 1}</TableCell>
-                  <TableCell className="font-mono">{maskUserHash(user.userHash)}</TableCell>
+                  <TableCell className="font-mono">
+                    {maskUserHash(user.userHash)}
+                  </TableCell>
                   <TableCell>{user.name}</TableCell>
                   <TableCell>
                     <span
@@ -145,7 +203,7 @@ export default function ActiveUsers() {
                         </button>
                       )}
                       <button
-                        onClick={() => handleRevoke(user.id)}
+                        onClick={() => handleRevoke(user?.userHash)}
                         className="gaming-btn-danger py-1 px-2 text-xs"
                       >
                         <Trash2 size={14} className="mr-1 inline" />

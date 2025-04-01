@@ -19,11 +19,11 @@ const navItems = [
     icon: Home,
     path: "/",
   },
-  {
-    name: "Add User",
-    icon: UserPlus,
-    path: "/add-user",
-  },
+  // {
+  //   name: "Add User",
+  //   icon: UserPlus,
+  //   path: "/add-user",
+  // },
   {
     name: "Active Users",
     icon: Users,
@@ -37,7 +37,7 @@ const navItems = [
   {
     name: "Recharge & Plans",
     icon: Receipt,
-    path: "/recharge",
+    path: "/recharge/:",
   },
   {
     name: "Bill Details",
@@ -80,7 +80,7 @@ export function Sidebar() {
           {/* Logo */}
           <div className="p-4 border-b border-border">
             <h1 className="font-bold text-xl tracking-tight bg-gradient-to-r from-neon-blue via-gaming-accent to-neon-purple bg-clip-text text-transparent animate-gradient-flow">
-              TUF Esports
+              TUF Esports Admin
             </h1>
           </div>
           
@@ -105,7 +105,7 @@ export function Sidebar() {
           {/* Footer */}
           <div className="p-4 border-t border-border">
             <div className="text-xs text-muted-foreground">
-              © 2024 TUF Esports Lounge
+              © {new Date().getFullYear()} TUF Esports Lounge
             </div>
           </div>
         </div>
