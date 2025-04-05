@@ -111,7 +111,7 @@ export default function BillDetails() {
           const dateComparison =
             new Date(b.date).getTime() - new Date(a.date).getTime();
           if (dateComparison === 0) {
-            return b.totalTime.localeCompare(a.totalTime);
+            return a.totalTime.localeCompare(b.totalTime);
           }
           return dateComparison;
         });
