@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Play, Trash2 } from "lucide-react";
+import Spinner from "@/components/ui/spinner";
 import {
   Table,
   TableBody,
@@ -13,7 +14,8 @@ import {
 import axios from "axios";
 
 export default function ActiveUsers() {
-  // Mock data for active users
+  const [loading, setLoading] = useState(false);
+  const [rev1, setRev1] = useState(false);
   const [users, setUsers] = useState([
     {
       id: 1,
@@ -53,6 +55,7 @@ export default function ActiveUsers() {
   ]);
 
   const fetchActiveSession = async () => {
+    setLoading(true);
     await axios
       .get(`${import.meta.env.VITE_API_URL}/admin/active`)
       .then((res) => {
@@ -78,6 +81,9 @@ export default function ActiveUsers() {
       .catch((err) => {
         console.log(err);
         toast.error("Error fetching active sessions. Please try again.");
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -130,6 +136,7 @@ export default function ActiveUsers() {
 
   // Handle revoke user
   const handleRevoke = async (userId: string) => {
+    setRev1(true);
     await axios
       .post(
         `
@@ -148,11 +155,22 @@ export default function ActiveUsers() {
       .catch((err) => {
         console.log(err);
         toast.error("Error revoking session. Please try again.");
+      })
+      .finally(() => {
+        setRev1(false);
       });
   };
   useEffect(() => {
     fetchActiveSession();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[80vh]">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -202,7 +220,11 @@ export default function ActiveUsers() {
                   <TableCell>{formatLoginTime(user.loginTime)}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
-                      {user.status === "Paused" && (
+                      {rev1 ? (
+                      <Spinner />
+                      ) : (
+                      <>
+                        {user.status === "Paused" && (
                         <button
                           onClick={() => handleResume(user.id)}
                           className="gaming-btn-success py-1 px-2 text-xs"
@@ -210,14 +232,16 @@ export default function ActiveUsers() {
                           <Play size={14} className="mr-1 inline" />
                           Resume
                         </button>
-                      )}
-                      <button
+                        )}
+                        <button
                         onClick={() => handleRevoke(user?.userHash)}
                         className="gaming-btn-danger py-1 px-2 text-xs"
-                      >
+                        >
                         <Trash2 size={14} className="mr-1 inline" />
                         Revoke
-                      </button>
+                        </button>
+                      </>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>

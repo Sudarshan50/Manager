@@ -5,6 +5,7 @@ import { Trash2, Plus, X } from "lucide-react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { set } from "date-fns";
+import Spinner from "@/components/ui/spinner";
 
 export default function RechargePlans() {
   const [loading, setLoading] = useState(false);
@@ -78,12 +79,14 @@ export default function RechargePlans() {
       .catch((err) => {
         console.log(err);
         toast.error("Error recharging user. Please refresh and try again.");
+      })
+      .finally(() => {
+        setLoading(false);
+        setRechargeForm({
+          userId: "",
+          plan: "",
+        });
       });
-    setLoading(false);
-    setRechargeForm({
-      userId: "",
-      plan: "",
-    });
   };
 
   useEffect(() => {
@@ -130,6 +133,8 @@ export default function RechargePlans() {
     toast.success("New plan added successfully");
   };
 
+  
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -144,71 +149,84 @@ export default function RechargePlans() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recharge Form */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <div className="gaming-card">
-            <h2 className="text-xl font-semibold mb-6">Recharge User</h2>
-
-            <form onSubmit={handleRechargeSubmit} className="space-y-6">
-              <div>
-                <label
-                  htmlFor="userId"
-                  className="block text-sm font-medium mb-1"
-                >
-                  User ID
-                </label>
-                <input
-                  id="userId"
-                  name="userId"
-                  type="text"
-                  value={
-                    params?.userId === ":"
-                      ? rechargeForm.userId
-                      : params?.userId
-                  }
-                  onChange={handleRechargeChange}
-                  className="gaming-input w-full"
-                  placeholder="Enter user ID or scan card"
-                  required
-                />
+        {loading ? (
+            <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            >
+            <div className="gaming-card">
+              <div className="flex flex-col items-center justify-center min-h-[285px]">
+              <Spinner />
               </div>
+            </div>
+            </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="gaming-card">
+              <h2 className="text-xl font-semibold mb-6">Recharge User</h2>
 
-              <div>
-                <label
-                  htmlFor="plan"
-                  className="block text-sm font-medium mb-1"
-                >
-                  Select Plan
-                </label>
-                <select
-                  id="plan"
-                  name="plan"
-                  value={rechargeForm.plan}
-                  onChange={handleRechargeChange}
-                  className="gaming-input w-full"
-                  required
-                >
-                  <option value="">Select a plan</option>
-                  {plans.map((plan) => (
-                    <option key={plan.id} value={plan.totalHours}>
-                      {plan.totalHours} hours - {plan.validity}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <button type="submit" className="gaming-btn-primary w-full">
-                  Recharge Now
-                </button>
-              </div>
-            </form>
+              <form onSubmit={handleRechargeSubmit} className="space-y-6">
+          <div>
+            <label
+              htmlFor="userId"
+              className="block text-sm font-medium mb-1"
+            >
+              User ID
+            </label>
+            <input
+              id="userId"
+              name="userId"
+              type="text"
+              value={
+                params?.userId === ":"
+            ? rechargeForm.userId
+            : params?.userId
+              }
+              onChange={handleRechargeChange}
+              className="gaming-input w-full"
+              placeholder="Enter user ID or scan card"
+              required
+            />
           </div>
-        </motion.div>
+
+          <div>
+            <label
+              htmlFor="plan"
+              className="block text-sm font-medium mb-1"
+            >
+              Select Plan
+            </label>
+            <select
+              id="plan"
+              name="plan"
+              value={rechargeForm.plan}
+              onChange={handleRechargeChange}
+              className="gaming-input w-full"
+              required
+            >
+              <option value="">Select a plan</option>
+              {plans.map((plan) => (
+                <option key={plan.id} value={plan.totalHours}>
+            {plan.totalHours} hours - {plan.validity}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <button type="submit" className="gaming-btn-primary w-full">
+              Recharge Now
+            </button>
+          </div>
+              </form>
+            </div>
+          </motion.div>
+        )}
 
         {/* Plans Management */}
         <motion.div

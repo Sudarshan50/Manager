@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { FileText, SortAsc, X } from "lucide-react";
 import { DatePicker } from "@/components/DatePicker";
 import axios from "axios";
+import Spinner from "@/components/ui/spinner";
 
 const billLogs = [
   {
@@ -58,6 +59,8 @@ const billLogs = [
 ];
 
 export default function BillDetails() {
+  const [loading1,setLoading1] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [dayUsers, setDayUsers] = useState(0);
   const [dayHours, setDayHours] = useState(0);
   const [weeklyHours, setWeeklyHours] = useState(0);
@@ -71,6 +74,7 @@ export default function BillDetails() {
 
   const fetchDashboardData = async () => {
     try {
+      setLoading(true);
       const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/admin/dashboard`
       );
@@ -82,6 +86,7 @@ export default function BillDetails() {
         setDayHours(currentDayBalance.toFixed(2));
         setWeeklyHours(weeklyBalance.toFixed(2));
         setMonthlyHours(monthlyBalance.toFixed(2));
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -91,6 +96,7 @@ export default function BillDetails() {
 
   const billLogfetch = async () => {
     try {
+      setLoading1(true);
       const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/admin/bills`
       );
@@ -109,7 +115,9 @@ export default function BillDetails() {
           }
           return dateComparison;
         });
+        setLoading1(false);
         setBillLogs(billData);
+
       }
     } catch (error) {
       console.error("Error fetching bill logs:", error);
@@ -136,6 +144,15 @@ export default function BillDetails() {
     toast.success("Statement generated successfully");
     setShowStatement(false);
   };
+  if(loading || loading1) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="loader">
+          <Spinner />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div

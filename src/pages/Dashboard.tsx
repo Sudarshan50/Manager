@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
+import Spinner from "@/components/ui/spinner";
 import { toast } from "sonner";
 
 export default function Dashboard() {
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [loading,setLoading] = useState(false);
   const [data, setData] = useState({
     totalUsers: 0,
     currentDayBalance: 0,
@@ -12,6 +13,7 @@ export default function Dashboard() {
   });
 
   const getDashContent = async () => {
+    setLoading(true);
     await axios
       .get(`${import.meta.env.VITE_API_URL}/admin/dashboard`)
       .then((res) => {
@@ -22,17 +24,23 @@ export default function Dashboard() {
       .catch((err) => {
         console.error(err);
         toast.error("Failed to fetch dashboard data");
-      });
+      }).finally(() => {
+        setLoading(false);
+      })
   };
 
   useEffect(() => {
     getDashContent();
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 500);
-
-    return () => clearTimeout(timer);
   }, []);
+
+if(loading) {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[80vh]">
+      <Spinner />
+    </div>
+  );
+}
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh]">

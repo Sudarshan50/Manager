@@ -5,9 +5,11 @@ import { toast } from "sonner";
 import { Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
+import Spinner from "@/components/ui/spinner";
 
 export default function AllCards() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   // Mock data for users
@@ -38,6 +40,7 @@ export default function AllCards() {
   ]);
 
   const fetchUsers = async () => {
+    setLoading(true);
     await axios
       .get(`${import.meta.env.VITE_API_URL}/admin/user`)
       .then((res) => {
@@ -63,6 +66,8 @@ export default function AllCards() {
       })
       .catch((err) => {
         console.log(err.response.data);
+      }).finally(() => {
+        setLoading(false);
       });
   };
 
@@ -97,6 +102,17 @@ export default function AllCards() {
       (hashToSearch && hashToSearch.toLowerCase().includes(query))
     );
   });
+
+
+  if(loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[80vh]">
+        <div className="loader">
+          <Spinner />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
