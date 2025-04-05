@@ -62,7 +62,7 @@ export default function BillDetails() {
   const [dayHours, setDayHours] = useState(0);
   const [weeklyHours, setWeeklyHours] = useState(0);
   const [monthlyHours, setMonthlyHours] = useState(0);
-  const [billLogs,setBillLogs] = useState([]);
+  const [billLogs, setBillLogs] = useState([]);
 
   // State for bill details
   const [showStatement, setShowStatement] = useState(false);
@@ -70,26 +70,30 @@ export default function BillDetails() {
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
   const fetchDashboardData = async () => {
-    try{
-      const res = await axios.get("http://localhost:3000/api/admin/dashboard");
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/admin/dashboard`
+      );
       if (res.status === 200) {
         console.log("Dashboard data fetched successfully:", res.data);
-        const { currentDayBalance, monthlyBalance, totalUsers,weeklyBalance } = res.data?.data;
+        const { currentDayBalance, monthlyBalance, totalUsers, weeklyBalance } =
+          res.data?.data;
         setDayUsers(totalUsers);
-        setDayHours((currentDayBalance).toFixed(2));
+        setDayHours(currentDayBalance.toFixed(2));
         setWeeklyHours(weeklyBalance.toFixed(2));
         setMonthlyHours(monthlyBalance.toFixed(2));
       }
-
-    }catch (error) {
+    } catch (error) {
       console.error("Error fetching dashboard data:", error);
       toast.error("Failed to fetch dashboard data");
     }
-  }
+  };
 
   const billLogfetch = async () => {
-    try{
-      const res = await axios.get("http://localhost:3000/api/admin/bills");
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/admin/bills`
+      );
       if (res.status === 200) {
         const billData = res.data?.data.map((log: any) => ({
           date: log?.date,
@@ -98,7 +102,8 @@ export default function BillDetails() {
           hour: log.billAmount,
         }));
         billData.sort((a: any, b: any) => {
-          const dateComparison = new Date(b.date).getTime() - new Date(a.date).getTime();
+          const dateComparison =
+            new Date(b.date).getTime() - new Date(a.date).getTime();
           if (dateComparison === 0) {
             return b.totalTime.localeCompare(a.totalTime);
           }
@@ -106,40 +111,32 @@ export default function BillDetails() {
         });
         setBillLogs(billData);
       }
-
-    }catch (error) {
+    } catch (error) {
       console.error("Error fetching bill logs:", error);
       toast.error("Failed to fetch bill logs");
     }
-  }
+  };
 
   useEffect(() => {
     Promise.all([fetchDashboardData(), billLogfetch()]);
-  },[]);
-  
-  
-  // Calculate summary stats
-  // const dayUsers = 12;
-  // const dayHours = 24.5;
-  // const weeklyHours = 87;
-  // const monthlyHours = 320;
-  
+  }, []);
+
   // Handle generate statement
   const handleGenerateStatement = () => {
     if (!startDate || !endDate) {
       toast.error("Please select both start and end dates");
       return;
     }
-    
+
     if (endDate < startDate) {
       toast.error("End date cannot be before start date");
       return;
     }
-    
+
     toast.success("Statement generated successfully");
     setShowStatement(false);
   };
-  
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -150,9 +147,11 @@ export default function BillDetails() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold mb-2">Bill Details</h1>
-            <p className="text-muted-foreground">Track usage statistics and generate statements</p>
+            <p className="text-muted-foreground">
+              Track usage statistics and generate statements
+            </p>
           </div>
-          
+
           <button
             onClick={() => setShowStatement(true)}
             className="gaming-btn-outline"
@@ -162,7 +161,7 @@ export default function BillDetails() {
           </button>
         </div>
       </div>
-      
+
       {/* Summary Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <SummaryCard
@@ -190,11 +189,11 @@ export default function BillDetails() {
           delay={0.4}
         />
       </div>
-      
+
       {/* Bill Logs */}
       <div className="gaming-card overflow-hidden">
         <h2 className="text-xl font-semibold mb-6">Usage Log</h2>
-        
+
         <div className="overflow-x-auto">
           <table className="gaming-table w-full">
             <thead>
@@ -220,7 +219,7 @@ export default function BillDetails() {
           </table>
         </div>
       </div>
-      
+
       {/* Statement Modal */}
       {showStatement && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -238,20 +237,26 @@ export default function BillDetails() {
                 <X size={20} />
               </button>
             </div>
-            
-            <form onSubmit={(e) => { e.preventDefault(); handleGenerateStatement(); }} className="space-y-6">
-              <DatePicker 
-                date={startDate} 
-                setDate={setStartDate} 
-                label="Start Date" 
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleGenerateStatement();
+              }}
+              className="space-y-6"
+            >
+              <DatePicker
+                date={startDate}
+                setDate={setStartDate}
+                label="Start Date"
               />
-              
-              <DatePicker 
-                date={endDate} 
-                setDate={setEndDate} 
-                label="End Date" 
+
+              <DatePicker
+                date={endDate}
+                setDate={setEndDate}
+                label="End Date"
               />
-              
+
               <div className="flex justify-end gap-4 pt-4">
                 <button
                   type="button"
@@ -260,10 +265,7 @@ export default function BillDetails() {
                 >
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className="gaming-btn-primary"
-                >
+                <button type="submit" className="gaming-btn-primary">
                   Download
                 </button>
               </div>

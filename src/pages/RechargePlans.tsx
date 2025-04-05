@@ -66,7 +66,7 @@ export default function RechargePlans() {
     }
     setLoading(true);
     await axios
-      .post(`http://localhost:3000/api/admin/recharge`, {
+      .post(`${import.meta.env.API_URL}/admin/recharge`, {
         cardId: rechargeForm.userId,
         rechargeAmount: rechargeForm.plan,
       })

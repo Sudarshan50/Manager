@@ -13,7 +13,7 @@ export default function Dashboard() {
 
   const getDashContent = async () => {
     await axios
-      .get("http://localhost:3000/api/admin/dashboard")
+      .get(`${import.meta.env.VITE_API_URL}/admin/dashboard`)
       .then((res) => {
         if (res.status === 200) {
           setData(res.data?.data);
@@ -60,7 +60,7 @@ export default function Dashboard() {
           />
           <StatCard
             title="Today's Hours"
-            value={(data?.currentDayBalance).toFixed(2) || "0"}
+            value={(data?.currentDayBalance)?.toFixed(2) || "0"}
             description="Hours of gameplay"
             delay={0.5}
           />

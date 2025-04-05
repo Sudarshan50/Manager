@@ -39,7 +39,7 @@ export default function AllCards() {
 
   const fetchUsers = async () => {
     await axios
-      .get(`http://localhost:3000/api/admin/user`)
+      .get(`${import.meta.env.VITE_API_URL}/admin/user`)
       .then((res) => {
         if(res.status === 200)
         {

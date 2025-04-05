@@ -54,7 +54,7 @@ export default function ActiveUsers() {
 
   const fetchActiveSession = async () => {
     await axios
-      .get("http://localhost:3000/api/admin/active")
+      .get(`${import.meta.env.VITE_API_URL}/admin/active`)
       .then((res) => {
         if (res.status === 200) {
           console.log(res.data);
@@ -98,7 +98,11 @@ export default function ActiveUsers() {
     const hours = Math.floor(diffInMinutes / 60);
 
     if (hours < 24) {
-      return `${hours.toLocaleString("en-US", { minimumIntegerDigits: 2 })}:${minutes.toLocaleString("en-US", { minimumIntegerDigits: 2 })}:${seconds.toLocaleString("en-US", { minimumIntegerDigits: 2 })} ago`;
+      return `${hours.toLocaleString("en-US", {
+        minimumIntegerDigits: 2,
+      })}:${minutes.toLocaleString("en-US", {
+        minimumIntegerDigits: 2,
+      })}:${seconds.toLocaleString("en-US", { minimumIntegerDigits: 2 })} ago`;
     }
 
     const diffInDays = Math.floor(hours / 24);
@@ -127,9 +131,14 @@ export default function ActiveUsers() {
   // Handle revoke user
   const handleRevoke = async (userId: string) => {
     await axios
-      .post("http://localhost:3000/api/admin/revoke", {
-        userHash: userId,
-      })
+      .post(
+        `
+        ${import.meta.env.VITE_API_URL}/admin/revoke
+        `,
+        {
+          userHash: userId,
+        }
+      )
       .then((res) => {
         if (res.status === 200) {
           setUsers(users.filter((user) => user.userHash !== userId));

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -13,8 +12,8 @@ export default function AddUser() {
     name: "",
     phone: "",
   });
-  const [loading,setLoading] = useState(false);
-  
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
@@ -22,45 +21,47 @@ export default function AddUser() {
       [name]: value,
     });
   };
-  
-  const handleSubmit = async(e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     // Validate form
     if (!formData.name || !formData.phone) {
       toast.error("Please fill in all required fields");
       return;
     }
-    
+
     if (!/^\d{10}$/.test(formData.phone)) {
       toast.error("Please enter a valid 10-digit phone number");
       return;
     }
-    await axios.post(`http://localhost:3000/api/admin/add`, {
-      userHash: userHash,
-      name: formData.name,
-      phoneNumber: formData.phone,
-    }).then((res) => {
-      if(res.status === 200)
-      {
-        console.log(res.data);
-      toast.success(`User ${formData.name} added successfully`);
-      }
-    }).catch((err) => {
-      console.log(err);
-      toast.error("Error adding user. Please try again.");
-    });
+    await axios
+      .post(`${import.meta.env.VITE_API_URL}/admin/add`, {
+        userHash: userHash,
+        name: formData.name,
+        phoneNumber: formData.phone,
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          console.log(res.data);
+          toast.success(`User ${formData.name} added successfully`);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Error adding user. Please try again.");
+      });
     setLoading(false);
     navigate("/all-cards");
-    
+
     // Reset form
     setFormData({
       name: "",
       phone: "",
     });
   };
-  
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -69,9 +70,11 @@ export default function AddUser() {
     >
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Add New User</h1>
-        <p className="text-muted-foreground">Register a new user to the TUF Esports Lounge system</p>
+        <p className="text-muted-foreground">
+          Register a new user to the TUF Esports Lounge system
+        </p>
       </div>
-      
+
       <div className="gaming-card max-w-2xl mx-auto">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
@@ -90,7 +93,7 @@ export default function AddUser() {
                 required
               />
             </div>
-            
+
             <div>
               <label htmlFor="phone" className="block text-sm font-medium mb-1">
                 Phone Number
@@ -107,9 +110,12 @@ export default function AddUser() {
                 pattern="[0-9]{10}"
               />
             </div>
-            
+
             <div>
-              <label htmlFor="userHash" className="block text-sm font-medium mb-1">
+              <label
+                htmlFor="userHash"
+                className="block text-sm font-medium mb-1"
+              >
                 User Hash
               </label>
               <input
@@ -124,12 +130,9 @@ export default function AddUser() {
               </p>
             </div>
           </div>
-          
+
           <div className="flex justify-end pt-4">
-            <button
-              type="submit"
-              className="gaming-btn-primary"
-            >
+            <button type="submit" className="gaming-btn-primary">
               Add User
             </button>
           </div>
