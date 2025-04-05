@@ -7,7 +7,7 @@ export default function Dashboard() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [data, setData] = useState({
     totalUsers: 0,
-    totalBill: 0,
+    currentDayBalance: 0,
     totalRevenue: 0,
   });
 
@@ -60,7 +60,7 @@ export default function Dashboard() {
           />
           <StatCard
             title="Today's Hours"
-            value={data?.totalBill || "0"}
+            value={(data?.currentDayBalance).toFixed(2) || "0"}
             description="Hours of gameplay"
             delay={0.5}
           />

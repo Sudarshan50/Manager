@@ -49,7 +49,7 @@ export default function AllCards() {
             name: user.userName || "Not Registered",
             mobileNo: user.phoneNumber || "Not Registered",
             balance: user.balance,
-            status: (user.activeSession === "active" ? "Active" : user.activeSession === null ? "Inactive" : "New"),
+            status: (user.activeSession === "active" || user.activeSession === "pause" ? "Active" : user.activeSession === null ? "Inactive" : "New"),
           }));
           const sortedUsers = [...data].sort((a, b) => {
             if (a.status === "New") return -1;

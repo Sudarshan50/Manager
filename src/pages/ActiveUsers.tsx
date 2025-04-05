@@ -98,7 +98,7 @@ export default function ActiveUsers() {
     const hours = Math.floor(diffInMinutes / 60);
 
     if (hours < 24) {
-      return `${hours} hour(s), ${minutes} minute(s), and ${seconds} second(s) ago`;
+      return `${hours.toLocaleString("en-US", { minimumIntegerDigits: 2 })}:${minutes.toLocaleString("en-US", { minimumIntegerDigits: 2 })}:${seconds.toLocaleString("en-US", { minimumIntegerDigits: 2 })} ago`;
     }
 
     const diffInDays = Math.floor(hours / 24);
